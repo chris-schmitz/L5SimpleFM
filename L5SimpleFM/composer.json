@@ -1,0 +1,20 @@
+{
+    "name": "cschmitz/l5-simplefm",
+    "description": "A Laravel 5 wrapper for Soliant Consulting's SimpleFM package.",
+    "require": {
+        "soliantconsulting/simplefm": "3.0.*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "cschmitz",
+            "email": "schmitz.chris@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "L5SimpleFM\\": "src/"
+        }
+    }
+}
