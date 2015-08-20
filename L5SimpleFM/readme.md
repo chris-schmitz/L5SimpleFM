@@ -126,9 +126,22 @@ Route::get('simplefmtest', function (FileMakerInterface $fm) {
 
 This use of method chaining can mak complex requests a bit more readable. The rest of the demos in this readme will use method chaining.
 
-### Interface vs Concrete class
+## Interface vs Concrete class
 
 L5SimpleFM has an optional interface called `FileMakerInterface` that can be injected into a constructor or controller method instead of injecting L5SimpleFM directly. This means that if you use the interface and ever want to switch out the L5SimpleFM implementation with something else the effect on your application's business logic should be minimal. 
 
 That said, if you want to inject the L5SimpleFM concrete class directly you can do so by using the class name instead of the interface. review the `L5SimpleFMServiceProvider` register method for constructor details.
 
+## Finding by fields
+
+
+
+## Finding by recid
+
+## Performing a script
+
+## Creating a new record
+
+## Updating an existing record
+
+## Deleting a record
