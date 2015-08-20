@@ -31,6 +31,13 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
         parent::__construct($adapter);
     }
 
+    public function findAll()
+    {
+        $this->primeCommandArray();
+        $this->addToCommandArray(['-findall' => null]);
+        return $this;
+    }
+
     /**
      * @param string Name of the layout to perform the query on.
      */

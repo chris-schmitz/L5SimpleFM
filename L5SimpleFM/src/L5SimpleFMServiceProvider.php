@@ -17,6 +17,11 @@ class L5SimpleFMServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->constructAndBindL5SimpleFM();
+    }
+
+    protected function constructAndBindL5SimpleFM()
+    {
         $this->app->bind('L5SimpleFM\Contracts\FileMakerInterface', function ($app) {
             $username = env('FM_USERNAME', 'myFileMakerDatabaseUsername');
             $password = env('FM_PASSWORD', 'myFileMakerDatabasePassword');
