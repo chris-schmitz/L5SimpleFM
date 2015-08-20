@@ -134,11 +134,56 @@ That said, if you want to inject the L5SimpleFM concrete class directly you can 
 
 ## Finding by fields
 
+L5SimpleFM accepts an associative array of `[field name => search value]`s for searching. 
+
+For instance, if we wanted to find all records in the `web_Users` layout from the company Skeleton Key who have a status of Active, we could use this chain of commands:
+
+     try {
+        $searchFields = [
+            'company' => 'Skeleton Key',
+            'status'  => 'Active',
+        ];
+
+        $result  = $fm->setLayout('web_Users')->findByFields($searchFields)->executeCommand();
+        $records = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return compact('records');
 
 
 ## Finding by recid
 
+FileMaker uses an internal record id for every record you create, regardless of if you add a serial number field to your tables. You can see this record id in FileMaker by going to the layout you want to search on, opening the Data Viewer, and entering the function `Get(RecordId)`.
+
+L5SimpleFM has a method specifically for searching by this record id. 
+
+Example. To find the record in the `web_Users` table with a recid of 3, we could use the following chain of commands:
+
+    try {
+        $result = $fm->setLayout('web_Users')->findByRecId(3)->executeCommand();
+        $record = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return compact('record');
+
 ## Performing a script
+
+Performing a script can be done as a stand alone command or as part of another chain *after* the command has been fired. 
+
+### Firing a stand alone script
+
+In the example FileMaker database, I have a script that will create a log record with a passed in message:
+
+    try {
+        $scriptParameters = 'This stand alone log record was created by L5SimpleFM';
+        $result = $fm->setLayout('web_User')->callScript('Create Log', $scriptParameters)->executeCommand();
+        $record = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return $record;
 
 ## Creating a new record
 
