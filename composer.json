@@ -1,5 +1,5 @@
 {
-    "name": "cschmitz/l5-simplefm",
+    "name": "cschmitz/l5simplefm",
     "description": "A Laravel 5 wrapper for Soliant Consulting's SimpleFM package.",
     "type": "library",
     "keywords": ["filemaker"],
