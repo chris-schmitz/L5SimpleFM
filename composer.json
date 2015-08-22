@@ -1,14 +1,19 @@
 {
     "name": "cschmitz/l5-simplefm",
     "description": "A Laravel 5 wrapper for Soliant Consulting's SimpleFM package.",
+    "type": "library",
+    "keywords": ["filemaker"],
+    "homepage": "https://github.com/chris-schmitz/L5SimpleFM",
     "require": {
         "soliantconsulting/simplefm": "3.0.*"
     },
     "license": "MIT",
     "authors": [
         {
-            "name": "cschmitz",
-            "email": "schmitz.chris@gmail.com"
+            "name": "Chris Schmitz",
+            "email": "schmitz.chris@gmail.com",
+            "role": "Developer",
+            "homepage": "https://www.linkedin.com/pub/christopher-schmitz/3a/824/41"
         }
     ],
     "minimum-stability": "stable",
