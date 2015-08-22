@@ -168,25 +168,109 @@ Example. To find the record in the `web_Users` table with a recid of 3, we could
     }
     return compact('record');
 
-## Performing a script
 
-Performing a script can be done as a stand alone command or as part of another chain *after* the command has been fired. 
+### Firing a script after a command
 
-### Firing a stand alone script
+A script can be set to fire after L5SimpleFM executes a different command. 
 
-In the example FileMaker database, I have a script that will create a log record with a passed in message:
+Here's the same log script fired after a findByRecId command:
 
     try {
-        $scriptParameters = 'This stand alone log record was created by L5SimpleFM';
-        $result = $fm->setLayout('web_User')->callScript('Create Log', $scriptParameters)->executeCommand();
+        $searchFields = ['username' => 'chris.schmitz'];
+        $message      = sprintf("Creating a log record after performing a find for the user record with username %s.", $searchFields['username']);
+        $result       = $fm->setLayout('web_Users')->findByFields($searchFields)->callScript('Create Log', $message)->executeCommand();
+        $records      = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return compact('records');
+
+## Creating a new record
+
+An associative array of `[field name => search value]`s can be used to create a new record.
+
+    try {
+        $recordValues = [
+            'username' => 'new.person',
+            'email'    => 'new.person@skeletonkey.com',
+            'company'  => 'Skeleton Key'
+        ];
+        $result = $fm->setLayout('web_Users')->createRecord($recordValues)->executeCommand();
         $record = $result->getRows();
     } catch (\Exception $e) {
         return $e->getMessage();
     }
-    return $record;
-
-## Creating a new record
+    return compact('record');
 
 ## Updating an existing record
 
+Like creating a new record, an associative array of `[field name => search values]`s can be used to update a record.
+
+Fields that are not included in the array will *not* be modified, so only specify what you want to change. If you need to clear a field, pass in an empty string.
+
+To update the record, you will need the record id for the specific record.
+
+    try {
+        $updatedValues = [
+            'username' => 'fired.person',
+            'email' => '',
+            'company' => '',
+            'status' => 'Inactive'
+        ];
+        $recid = 8;
+        $message = sprintf('User %s no longer works for Skeleton Key', $updatedValues['username']);
+        $result = $fm->setLayout('web_Users')->updateRecord($recid, $updatedValues)->callScript('Create Log', $message)->executeCommand();
+        $record = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return compact('record');
+
 ## Deleting a record
+
+To delete a record, specify the record id.
+
+Note that we do not need to set a `$result` variable as there are no records to fetch when the record is deleted successfully. Any error in deleting the record will be caught by the exception `catch`.
+
+    try {
+        $recid = 10;
+        $fm->setLayout('web_Users')->deleteRecord($recid)->executeCommand();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return ['success' => 'Record Deleted'];
+
+
+## Add command items
+
+There are many other custom web publishing XML commands that you can send to the FileMaker Server via SimpleFM that what I have outlined here. I tried to cover some of the most common (and ones that I need for the project that I extracted this wrapper from). There are also additional commands you can pass in with a particular request.
+
+The commands are sent via key/value pairs via the request url. You can see documentation for these in FileMaker Server's PDF "fmsXX_cwp_xml.pdf" where XX is the version number of the FileMaker Server you're accessing (e.g. fms13_cwp_xml.pdf).
+
+If you want to send a command to FileMaker Server that is not defined by the L5SimpleFM class you can use the `customCommand` method. You can pass an associative array of [command => value] pairs to add to the request url.
+
+E.g. If we wanted to set a max number of records to return with a `findAll` command, we can add the `-max` command in with the request:
+
+    try {
+        $maxRecordsToReturn = 3;
+        $result = $fm->setLayout('web_Users')->findAll()->addCommandItems(['-max' => $maxRecordsToReturn])->executeCommand();
+        $records = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return $records;
+
+You can also use this to construct any command to be sent via SimpleFM, including ones that are not included in the L5SimpleFM class methods. If we wanted to create a `findByFields` command by hand we could do it like this:
+
+    try {
+        $commandArray = [
+            'status' => 'Active',
+            '-max' => 3,
+            '-find' => null
+        ];
+        $result = $fm->setLayout('web_Users')->addCommandItems($commandArray)->executeCommand();
+        $records = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return compact('records');
