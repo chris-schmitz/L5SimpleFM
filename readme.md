@@ -23,6 +23,8 @@ Performing a find on the `web_Users` layout in a FileMaker database for a user w
 
 ## Installation
 
+**Note that these instructions are still in progress. I've not yet added this bundle to packagist so the composer install or update will not yet work** - (2015-08-21).
+
 - Create your Laravel project
 - Add the package to your `composer.json` file:
 
