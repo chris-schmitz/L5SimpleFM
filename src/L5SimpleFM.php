@@ -157,4 +157,11 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
         ]);
         return $this;
     }
+
+    public function addCommandItems($commandArray)
+    {
+        $this->addToCommandArray($commandArray);
+        return $this;
+    }
+
 }

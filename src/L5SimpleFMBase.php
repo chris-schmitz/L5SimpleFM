@@ -28,7 +28,7 @@ abstract class L5SimpleFMBase
     protected function primeCommandArray()
     {
         if (empty($this->layoutName)) {
-            throw new Exception('Layout name is missing.');
+            throw new \Exception('Layout name is missing.');
         }
         $this->commandArray['-db'] = $this->adapter->getHostConnection()->getDbName();
         $this->commandArray['-lay'] = $this->layoutName;
