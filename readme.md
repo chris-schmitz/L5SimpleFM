@@ -10,6 +10,14 @@ e.g.
 
 Performing a find on the `web_Users` layout in a FileMaker database for a user with the `web_Users::username` value of  **chris.schmitz** and the `web_Users::status` of **active** would look like this:
 
+	try {
+		$searchFields = ['username' => 'chris.schmitz', 'status' => 'active'];
+		$result = $fm->setLayout('web_Users')->findByFields($searchFields)->executeCommand();
+		$records = $result->getRows();
+	} catch (\Exception $e) {
+		return $e->getMessage();
+	}
+	return compact('records');
     
 
 
@@ -18,14 +26,14 @@ Performing a find on the `web_Users` layout in a FileMaker database for a user w
 - Create your Laravel project
 - Add the package to your `composer.json` file:
 
-    require: {
-        "cschmitz/l5-simplefm": "dev-master"
-    }
+	    require: {
+	        "cschmitz/l5-simplefm": "dev-master"
+	    }
 
 - Run a `composer install` or `composer update` to pull in the package.
 - Once the package is installed, add the L5SimpleFM service provider to the `providers` key in `config/app.php`:
 
-    L5SimpleFM\L5SimpleFMServiceProvider::class,
+        L5SimpleFM\L5SimpleFMServiceProvider::class,
 
 ## Configuration
 
@@ -112,17 +120,17 @@ Here's a breakdown on each step of the find:
 
 L5SimpleFM uses method chaining, so the same find all demo above can also be written like this:
 
-Route::get('simplefmtest', function (FileMakerInterface $fm) {
-    try {
-
-        $result = $fm->setLayout('web_Users')->findAll()->executeCommand();
-
-        $records = $result->getRows();
-    } catch (\Exception $e) {
-        return $e->getMessage();
-    }
-    return compact('records');
-});
+	Route::get('simplefmtest', function (FileMakerInterface $fm) {
+	    try {
+			// The separate steps from the previous example are chained here:
+	        $result = $fm->setLayout('web_Users')->findAll()->executeCommand();
+	
+	        $records = $result->getRows();
+	    } catch (\Exception $e) {
+	        return $e->getMessage();
+	    }
+	    return compact('records');
+	});
 
 This use of method chaining can mak complex requests a bit more readable. The rest of the demos in this readme will use method chaining.
 
@@ -131,6 +139,14 @@ This use of method chaining can mak complex requests a bit more readable. The re
 L5SimpleFM has an optional interface called `FileMakerInterface` that can be injected into a constructor or controller method instead of injecting L5SimpleFM directly. This means that if you use the interface and ever want to switch out the L5SimpleFM implementation with something else the effect on your application's business logic should be minimal. 
 
 That said, if you want to inject the L5SimpleFM concrete class directly you can do so by using the class name instead of the interface. review the `L5SimpleFMServiceProvider` register method for constructor details.
+
+&nbsp;
+
+# Commands
+
+All of the commands outlined here are found in the public method list of the `L5SimpleFM` class. 
+
+All examples expect that you have injected the `FileMakerInterface` as a dependency stored in the variable `$fm`.
 
 ## Finding by fields
 
@@ -169,7 +185,7 @@ Example. To find the record in the `web_Users` table with a recid of 3, we could
     return compact('record');
 
 
-### Firing a script after a command
+## Firing a script after a command
 
 A script can be set to fire after L5SimpleFM executes a different command. 
 
