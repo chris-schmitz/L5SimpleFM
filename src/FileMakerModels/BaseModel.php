@@ -81,6 +81,11 @@ abstract class BaseModel
         return $this->connection->skip($count);
     }
 
+    public function sort($sortArray)
+    {
+        return $this->conection->sort($sortArray);
+    }
+
     public function executeCommand()
     {
         return $this->connection->executeCommand();

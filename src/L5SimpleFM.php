@@ -168,4 +168,43 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
         $this->addToCommandArray(['-skip' => $count]);
     }
 
+    public function sort($sortArray)
+    {
+        foreach ($sortArray as $sortOptions) {
+
+            $this->validateSortCriteria($sortOptions);
+
+            $field = $sortOptions['field'];
+            $rank = $sortOptions['rank'];
+            $direction = $sortOptions['direction'];
+
+            $commandArraySortField = ['-sortfield.'+$rank => $field];
+            $this->addToCommandArray($commandArraySortField);
+
+            $commandArraySortOrder = ['-sortorder.'+$rank => $direction];
+            $this->addToCommandArray($commandArraySortOrder);
+        }
+
+        return $this;
+    }
+
+    protected function validateSortCriteria($sortOptions)
+    {
+
+        $field = $sortOptions['field'];
+        $rank = $sortOptions['rank'];
+        $direction = $sortOptions['direction'];
+
+        if (empty($field)) {
+            throw new \Exception("A field must be specified for the sort");
+        }
+
+        if (!empty($direction) && empty($field)) {
+            throw new \Exception('You must specify a field with the sort order');
+        }
+
+        if ($rank > 9 || $rank < 1) {
+            throw new \Exception('Rank must be a number 1 through 9');
+        }
+    }
 }
