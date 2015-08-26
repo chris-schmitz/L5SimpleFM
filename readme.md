@@ -27,7 +27,7 @@ Performing a find on the `web_Users` layout in a FileMaker database for a user w
 - Add the package to your `composer.json` file:
 
 	    require: {
-	        "cschmitz/l5simplefm": "dev-master"
+	        "cschmitz/l5simplefm": "0.1.*"
 	    }
 
 - Run a `composer install` or `composer update` to pull in the package.

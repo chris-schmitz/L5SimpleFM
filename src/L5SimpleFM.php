@@ -19,23 +19,9 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
      */
     protected $layout;
 
-    /**
-     * An array of the url parameters to send via SimpleUrl.
-     * @var array An associative array of url parameters
-     *            This could be commands (e.g. ['-find' => null]) or fieldName => fieldValue
-     */
-    protected $commandArray;
-
     public function __construct(Adapter $adapter)
     {
         parent::__construct($adapter);
-    }
-
-    public function findAll()
-    {
-        $this->primeCommandArray();
-        $this->addToCommandArray(['-findall' => null]);
-        return $this;
     }
 
     /**
@@ -52,6 +38,13 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
         // in the request url. I'm sure there's a good reason and maybe a way to not do both, but
         // for now we can just do both
         $this->adapter->setLayoutName($layoutName);
+        return $this;
+    }
+
+    public function findAll()
+    {
+        $this->primeCommandArray();
+        $this->addToCommandArray(['-findall' => null]);
         return $this;
     }
 
@@ -162,6 +155,17 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
     {
         $this->addToCommandArray($commandArray);
         return $this;
+    }
+
+    public function max($count)
+    {
+        $this->addToCommandArray(['-max' => $count]);
+        return $this;
+    }
+
+    public function skip($count)
+    {
+        $this->addToCommandArray(['-skip' => $count]);
     }
 
 }
