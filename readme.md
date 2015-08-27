@@ -234,6 +234,7 @@ This use of method chaining can mak complex requests a bit more readable. The re
 From here, you will have access to all of the methods outlined in [the `BaseModel` class](https://github.com/chris-schmitz/L5SimpleFM/blob/master/src/FileMakerModels/BaseModel.php). These methods are actually maps to the `L5SimpleFM` classes public methods. A quick reference for these methods:
 
 
+- [executeCommand()](#executecommand)
 - [findByFields($fieldValues)](#findallmax--null-skip--null)
 - [findAll($max = null, $skip = null)](#findbyfieldsfieldvalues)
 - [findByRecId($recId)](#findbyrecidrecid)
@@ -242,15 +243,14 @@ From here, you will have access to all of the methods outlined in [the `BaseMode
 - [deleteRecord($recId)](#deleterecordrecid)
 - [callScript($scriptName, $scriptParameters = null)](#callscriptscriptname-scriptparameters--null)
 - [addCommandItems($commandArray)](#addcommanditemscommandarray)
-- [max($count)]()
-- [skip($count)]()
-- [sort($sortArray)]()
-- [executeCommand()]()
+- [max($count)](#maxcount)
+- [skip($count)](#skipcount)
+- [sort($sortArray)](#sortsortarray)
 
 
 # Commands
 
-## `executeCommand()`
+## executeCommand()
 
 For any of these commands to execute, you need to call or chain on the `executeCommand()` command. 
 
@@ -294,7 +294,7 @@ The following is an example of an index method on a controller that breaks up th
     }
 
 
-## `findAll($max = null, $skip = null)`
+## findAll($max = null, $skip = null)
 
 Find all returns all records for a given Entity(layout). The `max` and `skip` parameters allow you to limit the number of records and page through the data.
 
@@ -317,7 +317,7 @@ We could perform a command like this:
     }
     return compact($records);
 
-## `findByFields($fieldValues)`
+## findByFields($fieldValues)
 
 L5SimpleFM accepts an associative array of `[field name => search value]`s for searching. 
 
@@ -337,7 +337,7 @@ For instance, if we wanted to find all records in the `web_Users` layout from th
     return compact('records');
 
 
-## `findByRecId($recId)`
+## findByRecId($recId)
 
 FileMaker uses an internal record id for every record you create, regardless of if you add a serial number field to your tables. You can see this record id in FileMaker by going to the layout you want to search on, opening the Data Viewer, and entering the function `Get(RecordId)`.
 
@@ -354,7 +354,7 @@ Example. To find the record in the `web_Users` table with a recid of 3, we could
     return compact('record');
 
 
-## `callScript($scriptName, $scriptParameters = null)`
+## callScript($scriptName, $scriptParameters = null)
 
 A script can be set to fire after L5SimpleFM executes a different command. 
 
@@ -370,7 +370,7 @@ Here's the same log script fired after a findByRecId command:
     }
     return compact('records');
 
-## `createRecord($data)`
+## createRecord($data)
 
 An associative array of `[field name => search value]`s can be used to create a new record.
 
@@ -387,7 +387,7 @@ An associative array of `[field name => search value]`s can be used to create a 
     }
     return compact('record');
 
-## `updateRecord($recId, $data)`
+## updateRecord($recId, $data)
 
 Like creating a new record, an associative array of `[field name => search values]`s can be used to update a record.
 
@@ -411,7 +411,7 @@ To update the record, you will need the record id for the specific record.
     }
     return compact('record');
 
-## `deleteRecord($recId)`
+## deleteRecord($recId)
 
 To delete a record, specify the record id.
 
@@ -426,7 +426,7 @@ Note that we do not need to set a `$result` variable as there are no records to 
     return ['success' => 'Record Deleted'];
 
 
-## `addCommandItems($commandArray)`
+## addCommandItems($commandArray)
 
 There are many other custom web publishing XML commands that you can send to the FileMaker Server via SimpleFM that what I have outlined here. I tried to cover some of the most common (and ones that I need for the project that I extracted this wrapper from). There are also additional commands you can pass in with a particular request.
 
@@ -460,7 +460,7 @@ You can also use this to construct any command to be sent via SimpleFM, includin
     }
     return compact('records');
 
-## `max($count)`
+## max($count)
 
 For commands that return a variable number of records you can chain `max()` into the command to limit the number of records returned:
 
@@ -480,7 +480,7 @@ For commands that return a variable number of records you can chain `max()` into
 
 While the total number of records found may be larger than 50, only 50 records will be returned in the rows.
 
-## `skip($count)`
+## skip($count)
 
 Similar to the `max()` command, the `skip()` command can be added to commands that return a variable number of records to affect the records returned. Skip will determine what record to start with when returning a limited number of records. 
 
@@ -503,7 +503,7 @@ In this example, we're only returning up to 50 records and we'll start with the 
 
 `skip()` and `max()` can be used in combination to facilitate paging through a found set of records.
 
-## `sort($sortArray)`
+## sort($sortArray)
 
 L5SimpleFM accepts a multi-dimensional array of data to perform sorting. 
 
