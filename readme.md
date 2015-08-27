@@ -63,7 +63,7 @@ Readme Contents:
 - [Configuration](#user-content-configuration)
 - [Important Notes](#user-content-important-notes)
 - [Demo FileMaker Database](#user-content-demo-filemaker-database)
-- [L5SimpleFM Models](#user-content-creating-a-l5-simplefm-model)
+- [L5SimpleFM Models](#user-content-l5simplefm-model)
 - [Using the L5SimpleFM Class Directly](#user-content-using-the-l5simplefm-class-directly)
 - [L5SimpleFM Class Commands](#user-content-l5simplefm-commands)
 
