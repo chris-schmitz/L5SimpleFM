@@ -64,7 +64,7 @@ Readme Contents:
 - [Important Notes](#user-content-important-notes)
 - [Demo FileMaker Database](#user-content-demo-filemaker-database)
 - [L5SimpleFM Models](#user-content-l5simplefm-model)
-- [L5SimpleFM Class Commands](#user-content-l5simplefm-commands)
+- [Commands](#user-content-commands)
 
 
 ## Installation
@@ -133,7 +133,7 @@ NOTE: **If you're going to host this example file on a publicly accessible FileM
 
 ## L5SimpleFM Model
 
-L5SimpleFM can be used just as a [basic data access tool](#user-content-basic-l5simplefm-usage), but it can also be used as a data model. Really, the difference between the two is very minor. The basic idea creating an instance of the L5SimpleFM class that is meant to only be used to access a specific entity (in FileMaker's case, this would likely be a single table via a layout).
+L5SimpleFM can be used just as a basic data access tool by accessing the L5SimpleFM class or the FileMakerInterface directly, but it can also be used as a data model. Really, the difference between the two is very minor. The basic idea creating an instance of the L5SimpleFM class that is meant to only be used to access a specific entity (in FileMaker's case, this would likely be a single table via a layout).
 
 ### Creating a L5SimpleFM model 
 
