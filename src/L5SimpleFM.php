@@ -176,13 +176,15 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
 
             $field = $sortOptions['field'];
             $rank = $sortOptions['rank'];
-            $direction = $sortOptions['direction'];
 
-            $commandArraySortField = ['-sortfield.'+$rank => $field];
+            $commandArraySortField = ['-sortfield.' . $rank => $field];
             $this->addToCommandArray($commandArraySortField);
 
-            $commandArraySortOrder = ['-sortorder.'+$rank => $direction];
-            $this->addToCommandArray($commandArraySortOrder);
+            if (isset($sortOptions['direction'])) {
+                $direction = $sortOptions['direction'];
+                $commandArraySortOrder = ['-sortorder.' . $rank => $direction];
+                $this->addToCommandArray($commandArraySortOrder);
+            }
         }
 
         return $this;
@@ -190,21 +192,27 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
 
     protected function validateSortCriteria($sortOptions)
     {
-
         $field = $sortOptions['field'];
         $rank = $sortOptions['rank'];
-        $direction = $sortOptions['direction'];
 
-        if (empty($field)) {
-            throw new \Exception("A field must be specified for the sort");
+        if (isset($sortOptions['direction'])) {
+            $direction = $sortOptions['direction'];
+
+            if (!empty($direction) && empty($field)) {
+                throw new \Exception('You must specify a field with the sort order. Sort array: ' . json_encode($sortOptions));
+            }
+            if (!in_array($direction, ['ascend', 'descend'])) {
+                throw new \Exception('If you specify a sort direction, it must be either, ascend or descend. Sort array: ' . json_encode($sortOptions));
+            }
         }
 
-        if (!empty($direction) && empty($field)) {
-            throw new \Exception('You must specify a field with the sort order');
+        if (empty($field)) {
+            throw new \Exception('A field must be specified for the sort. Sort array: ' . json_encode($sortOptions));
         }
 
         if ($rank > 9 || $rank < 1) {
-            throw new \Exception('Rank must be a number 1 through 9');
+            throw new \Exception('Rank must be a number 1 through 9. Sort array: ' . json_encode($sortOptions));
         }
+
     }
 }
