@@ -85,8 +85,37 @@ NOTE: **If you're going to host this example file on a publicly accessible FileM
 - Username: **web_user**
 - Password: **webdemo!**
 
+## L5SimpleFM Model
 
-## Demo
+L5SimpleFM can be used just as a [basic data access tool](#user-content-basic-l5simplefm-usage), but it can also be used as a data model. Really, the difference between the two is very minor. The basic idea creating an instance of the L5SimpleFM class that is meant to only be used to access a specific entity (in FileMaker's case, this would likely be a single table via a layout).
+
+### Creating a L5SimpleFM model 
+
+A L5SimpleFM model should extend the `L5SimpleFM\FileMakerModels\BaseModel` class:
+
+    <?php
+
+    namespace L5SimpleFM\FileMakerModels;
+
+    use L5SimpleFM\FileMakerModels\BaseModel;
+
+    class Example extends BaseModel
+    {
+
+        protected $layoutName = "example";
+
+    }
+
+In the `Example` FileMaker model class above, the layout in our FileMaker file would be named `example`.
+
+From here, you will have access to all of the methods outlined in [the `BaseModel` class](). These methods are actually maps to the `L5SimpleFM` classes public methods. A quick reference for these methods:
+
+
+
+
+## Basic L5SimpleFM Usage
+
+These are the notes on how you can use the L5SimpleFM class via the FileMakerInterface directly. You would use this as a data access tool vs a formal piece of MVC structure. To see how to use L5SimpleFM as a Model, see the [L5SimpleFM Model](#user-content-l5simplefm-model) section of the readme.
 
 ### A basic call
 
