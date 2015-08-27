@@ -19,6 +19,53 @@ Performing a find on the `web_Users` layout in a FileMaker database for a user w
 	}
 	return compact('records');
     
+L5SimpleFM also allows you to define Model classes for individual Entities within your FileMaker file. Using the same `web_Users` example above, defining a L5SimpleFM FileMaker model would look like this:
+
+	<?php
+	
+	namespace MyApp\FileMakerModels;
+	
+	use L5SimleFM\FileMakerModels\BaseModel;
+	
+	class User extends BaseModel
+	{
+		protected $layoutName = "web_Users";
+	}
+
+Performing the find from the first example using the newly defined `User` model would look like this:
+
+	<?php
+	
+	namespace MyApp\Http\Controllers;
+	
+	use MyApp\FileMakerModels\User;
+	
+	class UsersController {
+	
+		protected $user;
+
+		public function __construct(User $users){
+			$this->user = $user;
+		}
+		
+		public function findUsers(){
+			$searchFields = ['username' => 'chris.schmitz', 'status' => 'active'];
+			$result = $this->user->findByFields($searchFields)->executeCommand();
+			$records = $result->getRows();
+			return compact('records');
+		}
+	}
+
+
+Readme Contents:
+
+- [Installation](#user-content-installation)
+- [Configuration](#user-content-configuration)
+- [Important Notes](#user-content-important-notes)
+- [Demo FileMaker Database](#user-content-demo-filemaker-database)
+- [L5SimpleFM Models](#user-content-creating-a-l5-simplefm-model)
+- [Using the L5SimpleFM Class Directly](#user-content-using-the-l5simplefm-class-directly)
+- [L5SimpleFM Class Commands](#user-content-l5simplefm-commands)
 
 
 ## Installation
@@ -113,7 +160,7 @@ From here, you will have access to all of the methods outlined in [the `BaseMode
 
 
 
-## Basic L5SimpleFM Usage
+## Using the L5SimpleFM class directly
 
 These are the notes on how you can use the L5SimpleFM class via the FileMakerInterface directly. You would use this as a data access tool vs a formal piece of MVC structure. To see how to use L5SimpleFM as a Model, see the [L5SimpleFM Model](#user-content-l5simplefm-model) section of the readme.
 
@@ -171,7 +218,7 @@ That said, if you want to inject the L5SimpleFM concrete class directly you can 
 
 &nbsp;
 
-# Commands
+# L5SimpleFM Commands
 
 All of the commands outlined here are found in the public method list of the `L5SimpleFM` class. 
 
