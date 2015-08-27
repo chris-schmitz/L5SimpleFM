@@ -2,7 +2,7 @@
 
 L5SimpleFM is a wrapper for the [Soliant Consulting's SimpleFM package](https://github.com/soliantconsulting/SimpleFM).
 
-The wrapper has been made specifically for Laravel 5 integration. 
+The wrapper has been made specifically for Laravel 5 integration and can be installed via composer from the [packagist repository](https://packagist.org/packages/cschmitz/l5simplefm).
 
 L5SimpleFM allows you to make declarative queries against a hosted FileMaker database via the SimpleFM bundle.
 
