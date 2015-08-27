@@ -234,21 +234,65 @@ This use of method chaining can mak complex requests a bit more readable. The re
 From here, you will have access to all of the methods outlined in [the `BaseModel` class](https://github.com/chris-schmitz/L5SimpleFM/blob/master/src/FileMakerModels/BaseModel.php). These methods are actually maps to the `L5SimpleFM` classes public methods. A quick reference for these methods:
 
 
-- findByFields($fieldValues)
-- findAll($max = null, $skip = null)
-- findByRecId($recId)
-- createRecord($data)
-- updateRecord($recId, $data)
-- deleteRecord($recId)
-- callScript($scriptName, $scriptParameters = null)
-- addCommandItems($commandArray)
-- max($count)
-- skip($count)
-- sort($sortArray)
-- executeCommand()
+- [findByFields($fieldValues)](#findallmax--null-skip--null)
+- [findAll($max = null, $skip = null)](#findbyfieldsfieldvalues)
+- [findByRecId($recId)](#findbyrecidrecid)
+- [createRecord($data)](#createrecorddata)
+- [updateRecord($recId, $data)](#updaterecordrecid-data)
+- [deleteRecord($recId)](#deleterecordrecid)
+- [callScript($scriptName, $scriptParameters = null)](#callscriptscriptname-scriptparameters--null)
+- [addCommandItems($commandArray)](#addcommanditemscommandarray)
+- [max($count)]()
+- [skip($count)]()
+- [sort($sortArray)]()
+- [executeCommand()]()
 
 
 # Commands
+
+## `executeCommand()`
+
+For any of these commands to execute, you need to call or chain on the `executeCommand()` command. 
+
+Any command chained before `executeCommand()` is just used to build up the request's form. This is what allows you to call the command methods separately or chained together. 
+
+The following is an example of an index method on a controller that breaks up the method calls to build up an object that allows paging through a record set and fires `executeCommand()` once it's set up:
+
+    public function index()
+    {
+        // capturing request headers passed in from the browser
+        $max = $this->request->get('max');
+        $skip = $this->request->get('skip');
+
+        $sortArray = [
+            ['field' => 'company', 'rank' => 1, 'direction' => 'descend'],
+            ['field' => 'username', 'rank' => 2, 'direction' => 'ascend'],
+        ];
+
+        // note that we did not fire `executeCommand()` yet, we're still just building up the L5SimpleFM command
+        $sessions = $this->session->findAll()->sort($sortArray);
+
+        // we don't want to specify a max value unless the browser actually asked for it
+        if (!empty($max)) {
+            $sessions->max($max);
+        }
+
+        // we don't want to specify a skip value unless the browser actually asked for it
+        if (!empty($skip)) {
+            $sessions->skip($skip);
+        }
+
+        // now that our command has been assembled, we fire it
+        $result = $sessions->executeCommand();
+
+        // getting the total number of records found (which may be larger than our max value)
+        $total = $result->getCount();
+
+        $records = $result->getRows();
+
+        return compact('total', 'records');
+    }
+
 
 ## `findAll($max = null, $skip = null)`
 
@@ -410,6 +454,88 @@ You can also use this to construct any command to be sent via SimpleFM, includin
             '-find' => null
         ];
         $result = $this->user->addCommandItems($commandArray)->executeCommand();
+        $records = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return compact('records');
+
+## `max($count)`
+
+For commands that return a variable number of records you can chain `max()` into the command to limit the number of records returned:
+
+     try {
+        $searchFields = [
+            'company' => 'Skeleton Key',
+            'status'  => 'Active',
+        ];
+        $count = 50;
+
+        $result  = $this->user->findByFields($searchFields)->max($count)->executeCommand();
+        $records = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return compact('records');
+
+While the total number of records found may be larger than 50, only 50 records will be returned in the rows.
+
+## `skip($count)`
+
+Similar to the `max()` command, the `skip()` command can be added to commands that return a variable number of records to affect the records returned. Skip will determine what record to start with when returning a limited number of records. 
+
+     try {
+        $searchFields = [
+            'company' => 'Skeleton Key',
+            'status'  => 'Active',
+        ];
+        $count = 50;
+        $skip 10;
+
+        $result  = $this->user->findByFields($searchFields)->max($count)->skip($skip)->executeCommand();
+        $records = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return compact('records');
+
+In this example, we're only returning up to 50 records and we'll start with the 11th record in the found set (we skipped the first 10).
+
+`skip()` and `max()` can be used in combination to facilitate paging through a found set of records.
+
+## `sort($sortArray)`
+
+L5SimpleFM accepts a multi-dimensional array of data to perform sorting. 
+
+With sorting you **must** specify the:
+
+- Field being used to sort
+- The rank (or order) in which the field should be sorted
+
+If we wanted to sort by `company` and then `username` we could use the following array structure:
+
+    $sortOptions = [
+        ['field' => 'company', 'rank' => 1],
+        ['field' => 'username', 'rank' => 2]
+    ];
+
+
+You can also optionally specify the direction that the field can be sorted in.
+
+    $sortOptions = [
+        ['field' => 'company', 'rank' => 1, 'direction' => 'descend'],
+        ['field' => 'username', 'rank' => 2, 'direction' => 'ascend']
+    ];
+
+Once you've built up your sort options array, you can pass them into the `sort()` command:
+
+    try {
+        $sortOptions = [
+            ['field' => 'company', 'rank' => 1, 'direction' => 'descend'],
+            ['field' => 'username', 'rank' => 2, 'direction' => 'ascend']
+        ];
+
+        $result  = $this->user->findByFields($searchFields)sort($sortOptions)->executeCommand();
         $records = $result->getRows();
     } catch (\Exception $e) {
         return $e->getMessage();
