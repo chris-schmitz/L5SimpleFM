@@ -23,7 +23,7 @@ L5SimpleFM also allows you to define Model classes for individual Entities withi
 
 	<?php
 	
-	namespace MyApp\FileMakerModels;
+	namespace MyApp\Models;
 	
 	use L5SimleFM\FileMakerModels\BaseModel;
 	
@@ -38,7 +38,7 @@ Performing the find from the first example using the newly defined `User` model 
 	
 	namespace MyApp\Http\Controllers;
 	
-	use MyApp\FileMakerModels\User;
+	use MyApp\Models\User;
 	
 	class UsersController {
 	
@@ -86,10 +86,17 @@ Readme Contents:
 ### FileMaker
 - Make sure that your FileMaker Database is:
     - Hosted on a FileMaker Server that is accessible by your web server.
-    - Has a security account for the website user
-    - The privilege set that is set for the website user has the `fmxml` extended privilege enabled
+    - Has a security account for the website user.
+    - The privilege set that is set for the website user has the `fmxml` extended privilege enabled.
+
+For the purposes of this readme, I'll be using and referring to the [Demo file for this project](https://github.com/chris-schmitz/L5SimpleFM/tree/master/SampleDatabase).
 
 ### Laravel
+- Rename your `.env.example` file `.env`
+- From the command line, cd into the root of your project (you should be able to see the `artisan` tool) and run the command to generate the application key:
+
+        php artisan key:generate
+
 - In the Laravel project, update the `.env`
     - Add the following keys and values:
         - `FM_DATABASE=` 
@@ -131,6 +138,10 @@ NOTE: **If you're going to host this example file on a publicly accessible FileM
 - Username: **web_user**
 - Password: **webdemo!**
 
+---
+
+&nbsp;
+
 ## L5SimpleFM Model
 
 L5SimpleFM can be used just as a basic data access tool by accessing the L5SimpleFM class or the FileMakerInterface directly, but it can also be used as a data model. Really, the difference between the two is very minor. The basic idea creating an instance of the L5SimpleFM class that is meant to only be used to access a specific entity (in FileMaker's case, this would likely be a single table via a layout).
@@ -141,18 +152,18 @@ A L5SimpleFM model should extend the `L5SimpleFM\FileMakerModels\BaseModel` clas
 
     <?php
 
-    namespace L5SimpleFM\FileMakerModels;
+    namespace L5SimpleFM\Models;
 
     use L5SimpleFM\FileMakerModels\BaseModel;
 
-    class Example extends BaseModel
+    class User extends BaseModel
     {
 
-        protected $layoutName = "example";
+        protected $layoutName = "web_User";
 
     }
 
-In the `Example` FileMaker model class above, the layout in our FileMaker file would be named `example`.
+In the `Example` FileMaker model class above, the layout in our FileMaker file would be named `web_User`.
 
 ### A basic call
 
@@ -166,7 +177,7 @@ You can open the Laravel project's `app/Http/routes.php` file. Add the following
 
     <?php
 
-    use App\FileMakerModels\User;
+    use App\Models\User;
 
     Route::get('users', function (User $user) {
         try {
