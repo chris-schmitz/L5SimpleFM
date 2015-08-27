@@ -270,20 +270,20 @@ The following is an example of an index method on a controller that breaks up th
         ];
 
         // note that we did not fire `executeCommand()` yet, we're still just building up the L5SimpleFM command
-        $sessions = $this->session->findAll()->sort($sortArray);
+        $this->session->findAll()->sort($sortArray);
 
         // we don't want to specify a max value unless the browser actually asked for it
         if (!empty($max)) {
-            $sessions->max($max);
+            $this->session->max($max);
         }
 
         // we don't want to specify a skip value unless the browser actually asked for it
         if (!empty($skip)) {
-            $sessions->skip($skip);
+            $this->session->skip($skip);
         }
 
         // now that our command has been assembled, we fire it
-        $result = $sessions->executeCommand();
+        $result = $this->session->executeCommand();
 
         // getting the total number of records found (which may be larger than our max value)
         $total = $result->getCount();
