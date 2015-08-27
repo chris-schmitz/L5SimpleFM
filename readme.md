@@ -231,8 +231,9 @@ L5SimpleFM uses method chaining, so the same find all demo above can also be wri
     });
 
 This use of method chaining can mak complex requests a bit more readable. The rest of the demos in this readme will use method chaining.
-From here, you will have access to all of the methods outlined in [the `BaseModel` class](https://github.com/chris-schmitz/L5SimpleFM/blob/master/src/FileMakerModels/BaseModel.php). These methods are actually maps to the `L5SimpleFM` classes public methods. A quick reference for these methods:
+From here, you will have access to all of the methods outlined in [the `BaseModel` class](https://github.com/chris-schmitz/L5SimpleFM/blob/master/src/FileMakerModels/BaseModel.php). These methods are actually maps to the `L5SimpleFM` classes public methods.
 
+# Commands
 
 - [executeCommand()](#executecommand)
 - [findByFields($fieldValues)](#findallmax--null-skip--null)
@@ -248,7 +249,6 @@ From here, you will have access to all of the methods outlined in [the `BaseMode
 - [sort($sortArray)](#sortsortarray)
 
 
-# Commands
 
 ## executeCommand()
 
