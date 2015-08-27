@@ -158,6 +158,18 @@ In the `Example` FileMaker model class above, the layout in our FileMaker file w
 From here, you will have access to all of the methods outlined in [the `BaseModel` class](). These methods are actually maps to the `L5SimpleFM` classes public methods. A quick reference for these methods:
 
 
+- findByFields($fieldValues)
+- findAll($max = null, $skip = null)
+- findByRecId($recId)
+- createRecord($data)
+- updateRecord($recId, $data)
+- deleteRecord($recId)
+- callScript($scriptName, $scriptParameters = null)
+- addCommandItems($commandArray)
+- max($count)
+- skip($count)
+- sort($sortArray)
+- executeCommand()
 
 
 ## Using the L5SimpleFM class directly
