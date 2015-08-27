@@ -64,7 +64,6 @@ Readme Contents:
 - [Important Notes](#user-content-important-notes)
 - [Demo FileMaker Database](#user-content-demo-filemaker-database)
 - [L5SimpleFM Models](#user-content-l5simplefm-model)
-- [Using the L5SimpleFM Class Directly](#user-content-using-the-l5simplefm-class-directly)
 - [L5SimpleFM Class Commands](#user-content-l5simplefm-commands)
 
 
@@ -155,7 +154,73 @@ A L5SimpleFM model should extend the `L5SimpleFM\FileMakerModels\BaseModel` clas
 
 In the `Example` FileMaker model class above, the layout in our FileMaker file would be named `example`.
 
-From here, you will have access to all of the methods outlined in [the `BaseModel` class](). These methods are actually maps to the `L5SimpleFM` classes public methods. A quick reference for these methods:
+### A basic call
+
+Once you have:
+- Installed the bundle
+- Hosted and configured your FileMaker database
+- Configured your Laravel project
+- Created a model
+
+You can open the Laravel project's `app/Http/routes.php` file. Add the following route:
+
+    <?php
+
+    use App\FileMakerModels\User;
+
+    Route::get('users', function (User $user) {
+        try {
+            $user->findAll();
+            $user->max(10);
+            $user->sort([
+                ['field' => 'company', 'rank' => 1, 'direction' => 'descend'],
+                ['field' => 'status', 'rank' => 2, 'direction' => 'ascend'],
+            ]);
+            $result  = $user->executeCommand();
+            $records = $result->getRows();
+
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+        return compact('records');
+    });
+
+Here's a breakdown on each step of the find:
+
+- `$user->findAll();`
+    - Tells your L5SimpleFM `User` model to get ready to find all records on the layout.
+- `$user->max(10)`
+    - Tells your model to only return up to `10` record when it executes the command.
+- `$user->sort([ ['field' => 'company', 'rank' => 1, 'direction' => 'descend'], ['field' => 'status', 'rank' => 2, 'direction' => 'ascend'] ])`
+    - Tells your model to sort first by the company field in descending order and then by the status field in ascending order after executing the command.
+- `$result  = $user->executeCommand();`
+    - Tells L5SimpleFM to execute your command.
+    - The result of the command is a *SimpleFM* (not L5SimpleFM) object containing meta data on the request result as well as the resulting data.
+- `$records = $result->getRows();`
+    - Extracts the records from the SimpleFM object.
+
+### Method Chaining
+
+L5SimpleFM uses method chaining, so the same find all demo above can also be written like this:
+
+    Route::get('users', function (User $user) {
+        try {
+            $sortFields = [
+                ['field' => 'company', 'rank' => 1, 'direction' => 'descend'],
+                ['field' => 'status', 'rank' => 2, 'direction' => 'ascend'],
+            ];
+
+            $result = $user->findAll()->max(10)->sort($sortFields)->executeCommand();
+            $records = $result->getRows();
+
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+        return compact('records');
+    });
+
+This use of method chaining can mak complex requests a bit more readable. The rest of the demos in this readme will use method chaining.
+From here, you will have access to all of the methods outlined in [the `BaseModel` class](https://github.com/chris-schmitz/L5SimpleFM/blob/master/src/FileMakerModels/BaseModel.php). These methods are actually maps to the `L5SimpleFM` classes public methods. A quick reference for these methods:
 
 
 - findByFields($fieldValues)
@@ -172,71 +237,32 @@ From here, you will have access to all of the methods outlined in [the `BaseMode
 - executeCommand()
 
 
-## Using the L5SimpleFM class directly
+# Commands
 
-These are the notes on how you can use the L5SimpleFM class via the FileMakerInterface directly. You would use this as a data access tool vs a formal piece of MVC structure. To see how to use L5SimpleFM as a Model, see the [L5SimpleFM Model](#user-content-l5simplefm-model) section of the readme.
+## `findAll($max = null, $skip = null)`
 
-### A basic call
+Find all returns all records for a given Entity(layout). The `max` and `skip` parameters allow you to limit the number of records and page through the data.
 
-Once you've installed the bundle, hosted and configured your FileMaker database, and configured your Laravel project, open the Laravel project's `app/Http/routes.php` file. Add the following route:
+If we wanted to return all records from a layout a "page" at a time where:
 
-    Route::get('simplefmtest', function (FileMakerInterface $fm) {
-        try {
-            $fm->setLayout('web_Users');
-            $fm->findAll();
-            $result  = $fm->executeCommand();
-            $records = $result->getRows();
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-        return compact('records');
-    });
+- The page size was 10 records per page
+- We are on page 3
 
-Here's a breakdown on each step of the find:
+We could perform a command like this:
 
-- `$fm->setLayout('web_Users');`
-    - Sets the layout that you would like to perform the find against.
-- `$fm->findAll();`
-    - Tells L5SimpleFM to find all records on the layout.
-- `$result  = $fm->executeCommand();`
-    - Tells L5SimpleFM to execute your command.
-    - The result of the command is a *SimpleFM* (not L5SimpleFM) object containing meta data on the request result as well as the resulting data.
-- `$records = $result->getRows();`
-    - Extracts the records from the SimpleFM object.
+    // in your controller, these values would be passed in by the request parameters
+    $max = 10;
+    $skip = 20;
 
-### Method Chaining
+    try {
+        $result = $this->user->findAll()->max($max)->skip($skip)->executeCommand();
+        $records = $result->getRows();
+    } catch (\Exception $e->executeCommand()) {
+        return $e->getMessage();
+    }
+    return compact($records);
 
-L5SimpleFM uses method chaining, so the same find all demo above can also be written like this:
-
-	Route::get('simplefmtest', function (FileMakerInterface $fm) {
-	    try {
-			// The separate steps from the previous example are chained here:
-	        $result = $fm->setLayout('web_Users')->findAll()->executeCommand();
-	
-	        $records = $result->getRows();
-	    } catch (\Exception $e) {
-	        return $e->getMessage();
-	    }
-	    return compact('records');
-	});
-
-This use of method chaining can mak complex requests a bit more readable. The rest of the demos in this readme will use method chaining.
-
-## Interface vs Concrete class
-
-L5SimpleFM has an optional interface called `FileMakerInterface` that can be injected into a constructor or controller method instead of injecting L5SimpleFM directly. This means that if you use the interface and ever want to switch out the L5SimpleFM implementation with something else the effect on your application's business logic should be minimal. 
-
-That said, if you want to inject the L5SimpleFM concrete class directly you can do so by using the class name instead of the interface. review the `L5SimpleFMServiceProvider` register method for constructor details.
-
-&nbsp;
-
-# L5SimpleFM Commands
-
-All of the commands outlined here are found in the public method list of the `L5SimpleFM` class. 
-
-All examples expect that you have injected the `FileMakerInterface` as a dependency stored in the variable `$fm`.
-
-## Finding by fields
+## `findByFields($fieldValues)`
 
 L5SimpleFM accepts an associative array of `[field name => search value]`s for searching. 
 
@@ -248,7 +274,7 @@ For instance, if we wanted to find all records in the `web_Users` layout from th
             'status'  => 'Active',
         ];
 
-        $result  = $fm->setLayout('web_Users')->findByFields($searchFields)->executeCommand();
+        $result  = $this->user->findByFields($searchFields)->executeCommand();
         $records = $result->getRows();
     } catch (\Exception $e) {
         return $e->getMessage();
@@ -256,7 +282,7 @@ For instance, if we wanted to find all records in the `web_Users` layout from th
     return compact('records');
 
 
-## Finding by recid
+## `findByRecId($recId)`
 
 FileMaker uses an internal record id for every record you create, regardless of if you add a serial number field to your tables. You can see this record id in FileMaker by going to the layout you want to search on, opening the Data Viewer, and entering the function `Get(RecordId)`.
 
@@ -265,7 +291,7 @@ L5SimpleFM has a method specifically for searching by this record id.
 Example. To find the record in the `web_Users` table with a recid of 3, we could use the following chain of commands:
 
     try {
-        $result = $fm->setLayout('web_Users')->findByRecId(3)->executeCommand();
+        $result = $this->user->findByRecId(3)->executeCommand();
         $record = $result->getRows();
     } catch (\Exception $e) {
         return $e->getMessage();
@@ -273,7 +299,7 @@ Example. To find the record in the `web_Users` table with a recid of 3, we could
     return compact('record');
 
 
-## Firing a script after a command
+## `callScript($scriptName, $scriptParameters = null)`
 
 A script can be set to fire after L5SimpleFM executes a different command. 
 
@@ -282,14 +308,14 @@ Here's the same log script fired after a findByRecId command:
     try {
         $searchFields = ['username' => 'chris.schmitz'];
         $message      = sprintf("Creating a log record after performing a find for the user record with username %s.", $searchFields['username']);
-        $result       = $fm->setLayout('web_Users')->findByFields($searchFields)->callScript('Create Log', $message)->executeCommand();
+        $result       = $this->user->findByFields($searchFields)->callScript('Create Log', $message)->executeCommand();
         $records      = $result->getRows();
     } catch (\Exception $e) {
         return $e->getMessage();
     }
     return compact('records');
 
-## Creating a new record
+## `createRecord($data)`
 
 An associative array of `[field name => search value]`s can be used to create a new record.
 
@@ -299,14 +325,14 @@ An associative array of `[field name => search value]`s can be used to create a 
             'email'    => 'new.person@skeletonkey.com',
             'company'  => 'Skeleton Key'
         ];
-        $result = $fm->setLayout('web_Users')->createRecord($recordValues)->executeCommand();
+        $result = $this->user->createRecord($recordValues)->executeCommand();
         $record = $result->getRows();
     } catch (\Exception $e) {
         return $e->getMessage();
     }
     return compact('record');
 
-## Updating an existing record
+## `updateRecord($recId, $data)`
 
 Like creating a new record, an associative array of `[field name => search values]`s can be used to update a record.
 
@@ -323,14 +349,14 @@ To update the record, you will need the record id for the specific record.
         ];
         $recid = 8;
         $message = sprintf('User %s no longer works for Skeleton Key', $updatedValues['username']);
-        $result = $fm->setLayout('web_Users')->updateRecord($recid, $updatedValues)->callScript('Create Log', $message)->executeCommand();
+        $result = $this->user->updateRecord($recid, $updatedValues)->callScript('Create Log', $message)->executeCommand();
         $record = $result->getRows();
     } catch (\Exception $e) {
         return $e->getMessage();
     }
     return compact('record');
 
-## Deleting a record
+## `deleteRecord($recId)`
 
 To delete a record, specify the record id.
 
@@ -338,14 +364,14 @@ Note that we do not need to set a `$result` variable as there are no records to 
 
     try {
         $recid = 10;
-        $fm->setLayout('web_Users')->deleteRecord($recid)->executeCommand();
+        $this->user->deleteRecord($recid)->executeCommand();
     } catch (\Exception $e) {
         return $e->getMessage();
     }
     return ['success' => 'Record Deleted'];
 
 
-## Add command items
+## `addCommandItems($commandArray)`
 
 There are many other custom web publishing XML commands that you can send to the FileMaker Server via SimpleFM that what I have outlined here. I tried to cover some of the most common (and ones that I need for the project that I extracted this wrapper from). There are also additional commands you can pass in with a particular request.
 
@@ -357,7 +383,7 @@ E.g. If we wanted to set a max number of records to return with a `findAll` comm
 
     try {
         $maxRecordsToReturn = 3;
-        $result = $fm->setLayout('web_Users')->findAll()->addCommandItems(['-max' => $maxRecordsToReturn])->executeCommand();
+        $result = $this->user->findAll()->addCommandItems(['-max' => $maxRecordsToReturn])->executeCommand();
         $records = $result->getRows();
     } catch (\Exception $e) {
         return $e->getMessage();
@@ -372,7 +398,7 @@ You can also use this to construct any command to be sent via SimpleFM, includin
             '-max' => 3,
             '-find' => null
         ];
-        $result = $fm->setLayout('web_Users')->addCommandItems($commandArray)->executeCommand();
+        $result = $this->user->addCommandItems($commandArray)->executeCommand();
         $records = $result->getRows();
     } catch (\Exception $e) {
         return $e->getMessage();
