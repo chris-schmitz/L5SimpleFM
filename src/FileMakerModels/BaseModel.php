@@ -83,7 +83,7 @@ abstract class BaseModel
 
     public function sort($sortArray)
     {
-        return $this->conection->sort($sortArray);
+        return $this->connection->sort($sortArray);
     }
 
     public function executeCommand()

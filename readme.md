@@ -152,7 +152,7 @@ A L5SimpleFM model should extend the `L5SimpleFM\FileMakerModels\BaseModel` clas
 
     <?php
 
-    namespace L5SimpleFM\Models;
+    namespace App\Models;
 
     use L5SimpleFM\FileMakerModels\BaseModel;
 
