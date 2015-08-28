@@ -34,27 +34,30 @@ L5SimpleFM also allows you to define Model classes for individual Entities withi
 
 Performing the find from the first example using the newly defined `User` model would look like this:
 
-	<?php
-	
-	namespace MyApp\Http\Controllers;
-	
-	use MyApp\Models\User;
-	
-	class UsersController {
-	
-		protected $user;
+    <?php
 
-		public function __construct(User $users){
-			$this->user = $user;
-		}
-		
-		public function findUsers(){
-			$searchFields = ['username' => 'chris.schmitz', 'status' => 'active'];
-			$result = $this->user->findByFields($searchFields)->executeCommand();
-			$records = $result->getRows();
-			return compact('records');
-		}
-	}
+    namespace App\Http\Controllers;
+
+    use App\Http\Controllers\Controller;
+    use App\Models\User;
+
+    class UsersController extends Controller
+    {
+        protected $user;
+
+        public function __construct(User $users)
+        {
+            $this->user = $users;
+        }
+
+        public function findUsers()
+        {
+            $searchFields = ['username' => 'chris.schmitz', 'status' => 'active'];
+            $result = $this->user->findByFields($searchFields)->executeCommand();
+            $records = $result->getRows();
+            return compact('records');
+        }
+    }
 
 
 Readme Contents:
