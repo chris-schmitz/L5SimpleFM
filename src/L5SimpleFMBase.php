@@ -2,9 +2,9 @@
 
 namespace L5SimpleFM;
 
-use L5SimpleFM\Exceptions\DatabaseConnectionErrorException;
 use L5SimpleFM\Exceptions\GeneralException;
 use L5SimpleFM\Exceptions\LayoutNameIsMissingException;
+use L5SimpleFM\Exceptions\NoResultReturnedException;
 use L5SimpleFM\Exceptions\RecordsNotFoundException;
 
 /**
@@ -92,7 +92,7 @@ abstract class L5SimpleFMBase
     protected function checkResultForError($result, $commandArrayUsed)
     {
         if (empty($result)) {
-            throw new DatabaseConnectionErrorException($result->getErrorMessage());
+            throw new NoResultReturnedException('The SimpleFM request did not return a result.');
         }
         if ($result->getErrorCode() == 401) {
             throw new RecordsNotFoundException($result->getErrorMessage());
