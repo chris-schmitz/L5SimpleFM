@@ -166,6 +166,7 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
     public function skip($count)
     {
         $this->addToCommandArray(['-skip' => $count]);
+        return $this;
     }
 
     public function sort($sortArray)
