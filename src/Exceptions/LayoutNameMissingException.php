@@ -2,6 +2,8 @@
 
 namespace L5SimpleFM\Exceptions;
 
-class LayoutNameIsMissingException extends \Exception
+use L5SimpleFM\Exceptions\BaseException;
+
+class LayoutNameIsMissingException extends BaseException
 {
 }

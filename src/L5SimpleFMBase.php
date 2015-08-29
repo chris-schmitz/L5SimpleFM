@@ -3,6 +3,7 @@
 namespace L5SimpleFM;
 
 use L5SimpleFM\Exceptions\DatabaseConnectionErrorException;
+use L5SimpleFM\Exceptions\GeneralException;
 use L5SimpleFM\Exceptions\LayoutNameIsMissingException;
 use L5SimpleFM\Exceptions\RecordsNotFoundException;
 
@@ -76,8 +77,9 @@ abstract class L5SimpleFMBase
     {
         $this->adapter->setCommandArray($this->commandArray);
         $result = $this->adapter->execute();
+        $commandArrayUsed = $this->adapter->getCommandArray();
         $this->clearCommandArray();
-        $this->checkResultForError($result, $this->commandArray);
+        $this->checkResultForError($result, $commandArrayUsed);
         return $result;
     }
 
@@ -96,7 +98,8 @@ abstract class L5SimpleFMBase
             throw new RecordsNotFoundException($result->getErrorMessage());
         }
         if ($result->getErrorCode() !== 0) {
-            throw new \Exception($result->getErrorMessage() . json_encode($commandArrayUsed));
+            $message = $result->getErrorMessage() . ". Command used: " . json_encode($commandArrayUsed);
+            throw new GeneralException($message, $result->getErrorCode(), $result);
         }
     }
 }

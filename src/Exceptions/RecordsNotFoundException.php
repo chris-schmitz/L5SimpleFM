@@ -2,6 +2,8 @@
 
 namespace L5SimpleFM\Exceptions;
 
-class RecordsNotFoundException extends \Exception
+use L5SimpleFM\Exceptions\BaseException;
+
+class RecordsNotFoundException extends BaseException
 {
 }
