@@ -261,11 +261,29 @@ Any command chained before `executeCommand()` is just used to build up the reque
 
 The following is an example of an index method on a controller that breaks up the method calls to build up an object that allows paging through a record set and fires `executeCommand()` once it's set up:
 
-    public function index()
+
+    namespace App\Http\Controllers;
+
+    use App\Http\Controllers\Controller;
+    use Illuminate\Http\Request;
+
+    // The L5SimpleFM Model for User
+    use App\Models\User;
+
+    class UsersController extends Controller
+    {
+        protected $user;
+
+        public function __construct(User $users)
+        {
+            $this->user = $users;
+        }
+
+    public function index(Request $request)
     {
         // capturing request headers passed in from the browser
-        $max = $this->request->get('max');
-        $skip = $this->request->get('skip');
+        $max = $request->get('max');
+        $skip = $request->get('skip');
 
         $sortArray = [
             ['field' => 'company', 'rank' => 1, 'direction' => 'descend'],
@@ -273,20 +291,20 @@ The following is an example of an index method on a controller that breaks up th
         ];
 
         // note that we did not fire `executeCommand()` yet, we're still just building up the L5SimpleFM command
-        $this->session->findAll()->sort($sortArray);
+        $this->user->findAll()->sort($sortArray);
 
         // we don't want to specify a max value unless the browser actually asked for it
         if (!empty($max)) {
-            $this->session->max($max);
+            $this->user->max($max);
         }
 
         // we don't want to specify a skip value unless the browser actually asked for it
         if (!empty($skip)) {
-            $this->session->skip($skip);
+            $this->user->skip($skip);
         }
 
         // now that our command has been assembled, we fire it
-        $result = $this->session->executeCommand();
+        $result = $this->user->executeCommand();
 
         // getting the total number of records found (which may be larger than our max value)
         $total = $result->getCount();
@@ -310,15 +328,15 @@ We could perform a command like this:
 
     // in your controller, these values would be passed in by the request parameters
     $max = 10;
-    $skip = 20;
+    $skip = 2;
 
     try {
         $result = $this->user->findAll()->max($max)->skip($skip)->executeCommand();
         $records = $result->getRows();
-    } catch (\Exception $e->executeCommand()) {
+    } catch (\Exception $e) {
         return $e->getMessage();
     }
-    return compact($records);
+    return compact('records');
 
 ## findByFields($fieldValues)
 
@@ -328,7 +346,7 @@ For instance, if we wanted to find all records in the `web_Users` layout from th
 
      try {
         $searchFields = [
-            'company' => 'Skeleton Key',
+            'company' => 'Fake Company, INC',
             'status'  => 'Active',
         ];
 
@@ -346,7 +364,7 @@ FileMaker uses an internal record id for every record you create, regardless of 
 
 L5SimpleFM has a method specifically for searching by this record id. 
 
-Example. To find the record in the `web_Users` table with a recid of 3, we could use the following chain of commands:
+Ex;ample. To find the record in the `web_Users` table with a recid of 3, we could use the following chain of commands:
 
     try {
         $result = $this->user->findByRecId(3)->executeCommand();
@@ -405,7 +423,7 @@ To update the record, you will need the record id for the specific record.
             'company' => '',
             'status' => 'Inactive'
         ];
-        $recid = 8;
+        $recid = 2;
         $message = sprintf('User %s no longer works for Skeleton Key', $updatedValues['username']);
         $result = $this->user->updateRecord($recid, $updatedValues)->callScript('Create Log', $message)->executeCommand();
         $record = $result->getRows();
@@ -487,15 +505,15 @@ While the total number of records found may be larger than 50, only 50 records w
 
 Similar to the `max()` command, the `skip()` command can be added to commands that return a variable number of records to affect the records returned. Skip will determine what record to start with when returning a limited number of records. 
 
-     try {
+    try {
         $searchFields = [
-            'company' => 'Skeleton Key',
-            'status'  => 'Active',
+            'company' => 'Fake Company, INC',
+            'status' => 'Active',
         ];
         $count = 50;
-        $skip 10;
+        $skip = 2;
 
-        $result  = $this->user->findByFields($searchFields)->max($count)->skip($skip)->executeCommand();
+        $result = $this->user->findByFields($searchFields)->max($count)->skip($skip)->executeCommand();
         $records = $result->getRows();
     } catch (\Exception $e) {
         return $e->getMessage();
@@ -535,10 +553,10 @@ Once you've built up your sort options array, you can pass them into the `sort()
     try {
         $sortOptions = [
             ['field' => 'company', 'rank' => 1, 'direction' => 'descend'],
-            ['field' => 'username', 'rank' => 2, 'direction' => 'ascend']
+            ['field' => 'username', 'rank' => 2, 'direction' => 'ascend'],
         ];
 
-        $result  = $this->user->findByFields($searchFields)sort($sortOptions)->executeCommand();
+        $result = $this->user->findAll()->sort($sortOptions)->executeCommand();
         $records = $result->getRows();
     } catch (\Exception $e) {
         return $e->getMessage();
