@@ -68,6 +68,7 @@ Readme Contents:
 - [Demo FileMaker Database](#user-content-demo-filemaker-database)
 - [L5SimpleFM Models](#user-content-l5simplefm-model)
 - [Commands](#user-content-commands)
+- [Exceptions](#user-content-exceptions)
 
 
 ## Installation
@@ -562,3 +563,156 @@ Once you've built up your sort options array, you can pass them into the `sort()
         return $e->getMessage();
     }
     return compact('records');
+
+# Exceptions 
+
+All of the exceptions that L5SimpleFM throws come from the class `L5SimpleFMBase`. The exceptions can be caught by their individual names, e.g.:
+
+    try {
+        $result = $this->user->findByFields(['company' => 'error co.'])->executeCommand();
+        $records = $result->getRows();
+    } catch (RecordsNotFoundException $e) {
+        return $e->getMessage();
+    }
+
+Or by catching a generic php exception class (which all of the custom exceptions extend from):
+
+    try {
+        $result = $this->user->findByFields(['company' => 'error co.'])->executeCommand();
+        $records = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+
+## Troubleshooting with getCommandResult
+
+For the `RecordsNotFoundException` and `GeneralException` classes, the result object from the SimpleFM request is returned and can be accessed by the method `->getCommandResult()`. e.g.:
+
+       try {
+            $searchFields = [
+                // there is no Error Company and the `RecordsNotFoundException` will be thrown
+                'company' => 'Error Company', 
+                'status' => 'Active',
+            ];
+
+            $result = $this->user->findByFields($searchFields)->executeCommand();
+            $records = $result->getRows();
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+
+            // You can use the `getCommandResult()` method to return 
+            // the entire SimpleFM result object. 
+            $result = $e->getCommandResult();
+            dd($result);
+
+
+            return $message;
+        }
+        return compact('records');
+    }
+
+This can be helpful because SimpleFM's FmResultSet object includes a debug url which is helpful in figuring out why the result failed:
+
+    FmResultSet {#153 ▼
+      #debugUrl: "http://web_user:[...]@127.0.0.1:80/fmi/xml/fmresultset.xml?-db=L5SimpleFMExample&-lay=web_Users&-db=L5SimpleFMExample&-lay=web_Users&company=Error+Co&status=Active&-find"
+      #errorCode: 401
+      #errorMessage: "No records match the request"
+      #errorType: "FileMaker"
+      #count: 0
+      #fetchSize: 0
+      #rows: []
+    }
+
+This also means you get access to the FmResultSet's other [result handling methods](https://github.com/soliantconsulting/SimpleFM#handle-the-result) like `getDebugUrl()`:
+
+       try {
+            $searchFields = [
+                // there is no Error Company and the `RecordsNotFoundException` will be thrown
+                'company' => 'Error Company', 
+                'status' => 'Active',
+            ];
+
+            $result = $this->user->findByFields($searchFields)->executeCommand();
+            $records = $result->getRows();
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+            $result = $e->getCommandResult();
+
+            // spits out the debug url itself
+            dd($result->getDebugUrl());
+
+            return $message;
+        }
+        return compact('records');
+    }
+
+**Note** that even though the FmResultSet and debug URL don't expose your password, it's still not a good idea to leave it in your project when you push to production, i.e. Use it for development debugging only.
+
+## LayoutNameIsMissingException
+
+This exception is thrown if you try to set a layout name without a value or with an empty string. 
+
+If you're creating FileMaker models with L5SimpleFM, you would see this error if you did not specify the `protected $layoutName;` property.
+
+This exception does not contain a result object.
+
+## NoResultReturnedException
+
+This exception is thrown if SimpleFM for some reason does not return a result object. 
+
+This exception does not contain a result object.
+
+## RecordsNotFoundException
+
+This exception is returned if your find query does not return a result. 
+
+I created a specific exception for this because it is an error that is thrown that you are likely to ignore. 
+
+For example, if you're looking for an existing user record and creating a new record if an existing one isn't found, you could catch for the exception and flag to the rest of your app to create a new record:
+
+    public function updateOrCreateNewUser(Request $request)
+    {
+        // email passed in from a POST request
+        $email = $request->get('email');
+
+        $userRecord = $this->checkForExistingUserRecord($email);
+        
+        if ($userRecord == false) {
+            $record = $this->createNewUser($request->all());
+        } else {
+            $record = $this->updateExistingUser($userRecord['recid'], $request->all());
+        }
+        return compact('record');
+    }
+
+    protected function checkForExistingUserRecord($email)
+    {
+        try {
+            $quotedEmail = sprintf('"%s"', $email);
+
+            $result = $this->user
+                ->findByFields(['email' => $quotedEmail])
+                ->executeCommand();
+            $record = $result->getRows()[0];
+        } catch (RecordsNotFoundException $e) {
+            return false;
+        }
+        return $record;
+    }
+
+In other cases you may want to treat a record not found exception as you would any other exception.
+
+The RecordsNotFoundException **does** return a a command result.
+
+## GeneralException
+
+This is an exception that is thrown if the SimpleFM request:
+- *Did* return a result
+- The result *did* have an error
+- The error was not the Records Not Found error.
+
+These would be any other FileMaker XML custom web publishing errors.
+
+The GeneralException **does** return a a command result.
+
+In fact, the only reason I defined a general exception instead of throwing a regular PHP Exception is so that the command result can be passed back. 
