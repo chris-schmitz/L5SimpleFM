@@ -39,7 +39,7 @@ abstract class L5SimpleFMBase
     protected function primeCommandArray()
     {
         if (empty($this->layoutName)) {
-            throw new LayoutNameIsMissingException;
+            throw new LayoutNameIsMissingException('You must specify a layout name.');
         }
         $this->commandArray['-db'] = $this->adapter->getHostConnection()->getDbName();
         $this->commandArray['-lay'] = $this->layoutName;
@@ -95,7 +95,7 @@ abstract class L5SimpleFMBase
             throw new NoResultReturnedException('The SimpleFM request did not return a result.');
         }
         if ($result->getErrorCode() == 401) {
-            throw new RecordsNotFoundException($result->getErrorMessage());
+            throw new RecordsNotFoundException($result->getErrorMessage(), $result->getErrorCode(), $result);
         }
         if ($result->getErrorCode() !== 0) {
             $message = $result->getErrorMessage() . ". Command used: " . json_encode($commandArrayUsed);
