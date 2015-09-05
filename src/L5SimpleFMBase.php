@@ -67,6 +67,7 @@ abstract class L5SimpleFMBase
         // empty array SimpleFM will not overwrite the previous command
         $this->commandArray = [];
         $this->adapter->setCommandArray($this->commandArray);
+        return $this;
     }
 
     /**
