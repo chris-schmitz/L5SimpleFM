@@ -7,15 +7,15 @@ This tool has been made specifically for Laravel 5 integration and can be instal
 
 Readme Contents:
 
-- [Quick Examples](#user-content-quick-examples)
-- [Required tools](#user-content-required-tools)
-- [Installation](#user-content-installation)
-- [Configuration](#user-content-configuration)
-- [Important Notes](#user-content-important-notes)
-- [Demo FileMaker Database](#user-content-demo-filemaker-database)
-- [L5SimpleFM Models](#user-content-l5simplefm-model)
-- [Commands](#user-content-commands)
-- [Exceptions](#user-content-exceptions)
+- [Quick Examples](#quick-examples)
+- [Required tools](#required-tools)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Important Notes](#important-notes)
+- [Demo FileMaker Database](#demo-filemaker-database)
+- [L5SimpleFM Models](#l5simplefm-model)
+- [Commands](#commands)
+- [Exceptions](#exceptions)
 
 # Quick Examples
 
@@ -264,7 +264,7 @@ From here, you will have access to all of the methods outlined in [the `BaseMode
 - [max($count)](#maxcount)
 - [skip($count)](#skipcount)
 - [sort($sortArray)](#sortsortarray)
-- [resetLayout($layoutName)](#)
+- [resetLayout($layoutName)](#resetlayoutlayoutname)
 
 
 
