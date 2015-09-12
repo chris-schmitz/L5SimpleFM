@@ -4,6 +4,20 @@ L5SimpleFM is a wrapper for the [Soliant Consulting's SimpleFM package](https://
 
 The wrapper has been made specifically for Laravel 5 integration and can be installed via composer from the [packagist repository](https://packagist.org/packages/cschmitz/l5simplefm).
 
+Readme Contents:
+
+- [Quick Examples](#user-content-quick-examples)
+- [Required tools](#user-content-required-tools)
+- [Installation](#user-content-installation)
+- [Configuration](#user-content-configuration)
+- [Important Notes](#user-content-important-notes)
+- [Demo FileMaker Database](#user-content-demo-filemaker-database)
+- [L5SimpleFM Models](#user-content-l5simplefm-model)
+- [Commands](#user-content-commands)
+- [Exceptions](#user-content-exceptions)
+
+# Quick Examples
+
 L5SimpleFM allows you to make declarative queries against a hosted FileMaker database via the SimpleFM bundle.
 
 e.g. 
@@ -60,15 +74,17 @@ Performing the find from the first example using the newly defined `User` model 
     }
 
 
-Readme Contents:
 
-- [Installation](#user-content-installation)
-- [Configuration](#user-content-configuration)
-- [Important Notes](#user-content-important-notes)
-- [Demo FileMaker Database](#user-content-demo-filemaker-database)
-- [L5SimpleFM Models](#user-content-l5simplefm-model)
-- [Commands](#user-content-commands)
-- [Exceptions](#user-content-exceptions)
+## Required Tools
+
+The following tools are required to run this project:
+
+- <a href="http://php.net/manual/en/install.php" target="_blank">PHP version 5.5 or newer</a>
+- <a href="https://getcomposer.org/" target="_blank">Composer</a>
+    - If you're installing composer for the first time, make sure you <a href="https://getcomposer.org/doc/00-intro.md#globally" target="_blank">install composer globally</a>
+- <a href="http://laravel.com/docs/5.1" target="_blank">Laravel 5.1</a>
+- <a href="https://git-scm.com/" target="_blank">Git</a>
+- <a href="http://store.filemaker.com/US/ENG/LIC/" target="_blank">FileMaker Server version 13 or newer</a>
 
 
 ## Installation
