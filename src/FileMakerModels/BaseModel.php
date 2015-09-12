@@ -93,6 +93,6 @@ abstract class BaseModel
 
     public function resetLayout($layoutName)
     {
-        $this->connection->setLayout($layoutName);
+        return $this->connection->setLayout($layoutName);
     }
 }
