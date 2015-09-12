@@ -1,8 +1,9 @@
 # L5SimpleFM
 
-L5SimpleFM is a wrapper for the [Soliant Consulting's SimpleFM package](https://github.com/soliantconsulting/SimpleFM).
+L5SimpleFM is a tool wrapped around the [Soliant Consulting's SimpleFM package](https://github.com/soliantconsulting/SimpleFM). L5SimpleFM allows you to make declarative queries against a hosted FileMaker database.
 
-The wrapper has been made specifically for Laravel 5 integration and can be installed via composer from the [packagist repository](https://packagist.org/packages/cschmitz/l5simplefm).
+
+This tool has been made specifically for Laravel 5 integration and can be installed via composer from the [packagist repository](https://packagist.org/packages/cschmitz/l5simplefm).
 
 Readme Contents:
 
@@ -17,10 +18,6 @@ Readme Contents:
 - [Exceptions](#user-content-exceptions)
 
 # Quick Examples
-
-L5SimpleFM allows you to make declarative queries against a hosted FileMaker database via the SimpleFM bundle.
-
-e.g. 
 
 Performing a find on the `web_Users` layout in a FileMaker database for a user with the `web_Users::username` value of  **chris.schmitz** and the `web_Users::status` of **active** would look like this:
 
@@ -267,6 +264,7 @@ From here, you will have access to all of the methods outlined in [the `BaseMode
 - [max($count)](#maxcount)
 - [skip($count)](#skipcount)
 - [sort($sortArray)](#sortsortarray)
+- [resetLayout($layoutName)](#)
 
 
 
@@ -579,6 +577,31 @@ Once you've built up your sort options array, you can pass them into the `sort()
         return $e->getMessage();
     }
     return compact('records');
+
+## resetLayout($layoutName)
+
+One of the shortcomings (in my opinion) of FileMaker's custom web publishing is that you cannot specify the fields returned from a request; you always get data from *every field on the layout* that you're requesting from. From a sql viewpoint, requests to FileMaker Server via custom web publishing are always `SELECT * FROM mylayout ...` and not `SELECT field1,field3,fieldN FROM mylayout ...`.
+
+Because of this I added the ability to reset the layout you're using at runtime. 
+
+    try {
+        $searchFields = [
+            'company' => 'Fake Company, INC',
+            'status' => 'Active',
+        ];
+
+        $result = $this->user->resetLayout('web_UserList')->findByFields($searchFields)->max($count)->skip($skip)->executeCommand();
+        $records = $result->getRows();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+    return compact('records');
+
+This means you can have more than one layout that represents an entity. 
+
+An actual example of this is if your web app has a list that uses a handful of columns from your entity to let the user identify each record. Clicking on a row opens a new window that shows all of the fields for the entity. If you're only using one layout to represent the entity then you're always returning all of the fields for the entity when you generate the list view even though you don't need them. 
+
+With the `resetLayout` command, you can define two layouts, a list layout with only the fields you need for the list and a details layout which has all of the fields you need for the details window. When you need to use the alternate layout (the one not defined as the `$layoutName` property in the model) you can use the `resetLayout` command to fire the request against the alternate layout.
 
 # Exceptions 
 
