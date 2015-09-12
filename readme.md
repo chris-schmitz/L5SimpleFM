@@ -143,7 +143,7 @@ Dumping the object is very helpful when debugging while developing, but dumping 
 
 ## Demo FileMaker Database
 
-A demo FileMaker database [can be found here](https://github.com/chris-schmitz/L5SimpleFM/tree/master/SampleDatabase).
+A demo FileMaker database, L5SimpleFMExample.fmp12.zip,  [can be found here in the release section.](https://github.com/chris-schmitz/L5SimpleFM/releases).
 
 ### Full Access Account
 - Username: **Admin**
