@@ -90,4 +90,9 @@ abstract class BaseModel
     {
         return $this->connection->executeCommand();
     }
+
+    public function resetLayout($layoutName)
+    {
+        $this->connection->setLayout($layoutName);
+    }
 }
