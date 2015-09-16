@@ -157,6 +157,11 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
         return $this;
     }
 
+    public function clearCommandItems()
+    {
+        return $this->connection->clearCOmmandArray();
+    }
+
     public function max($count)
     {
         $this->addToCommandArray(['-max' => $count]);
