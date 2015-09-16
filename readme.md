@@ -5,6 +5,8 @@ L5SimpleFM is a tool wrapped around the [Soliant Consulting's SimpleFM package](
 
 This tool has been made specifically for Laravel 5 integration and can be installed via composer from the [packagist repository](https://packagist.org/packages/cschmitz/l5simplefm).
 
+An example Task project built using L5SimpleFM can be found [here on github](https://github.com/chris-schmitz/TaskWithL5SimpleFM).
+
 Readme Contents:
 
 - [Quick Examples](#quick-examples)
