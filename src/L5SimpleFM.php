@@ -159,7 +159,7 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
 
     public function clearCommandItems()
     {
-        return $this->connection->clearCOmmandArray();
+        return $this->connection->clearCommandArray();
     }
 
     public function max($count)
