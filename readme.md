@@ -31,15 +31,15 @@ Performing a find on the `web_Users` layout in a FileMaker database for a user w
 		return $e->getMessage();
 	}
 	return compact('records');
-    
+
 L5SimpleFM also allows you to define Model classes for individual Entities within your FileMaker file. Using the same `web_Users` example above, defining a L5SimpleFM FileMaker model would look like this:
 
 	<?php
-	
+
 	namespace MyApp\Models;
-	
+
 	use L5SimleFM\FileMakerModels\BaseModel;
-	
+
 	class User extends BaseModel
 	{
 		protected $layoutName = "web_Users";
@@ -72,7 +72,50 @@ Performing the find from the first example using the newly defined `User` model 
         }
     }
 
+Or by adding the method to the model class itself:
 
+	<?php
+
+	namespace MyApp\Models;
+
+	use L5SimleFM\FileMakerModels\BaseModel;
+
+	class User extends BaseModel
+	{
+		protected $layoutName = "web_Users";
+
+		public function findUserByUsername($username, $status = 'active'){
+			$searchFields = ['username' => $username, 'status' => $status];
+			$result = $this->findByFields($searchFields)->executeCommand();
+			return $result->getRows();
+		}
+
+	}
+
+and then using the method within your controller:
+
+	<?php
+
+	namespace App\Http\Controllers;
+
+	use App\Http\Controllers\Controller;
+	use App\Models\User;
+
+	class UsersController extends Controller
+	{
+		protected $user;
+
+		public function __construct(User $users)
+		{
+			$this->user = $users;
+		}
+
+		public function findUsers()
+		{
+			$user = $this->user->findUserByUsername('chris.schmitz');
+			return compact('user');
+		}
+	}
 
 ## Required Tools
 
@@ -118,7 +161,7 @@ For the purposes of this readme, I'll be using and referring to the [Demo file f
 
 - In the Laravel project, update the `.env`
     - Add the following keys and values:
-        - `FM_DATABASE=` 
+        - `FM_DATABASE=`
             - The value should be the name of your database file without the extension.
         - `FM_USERNAME=`
             - The value should be the website security account name.
@@ -126,18 +169,30 @@ For the purposes of this readme, I'll be using and referring to the [Demo file f
             - The value should be the website security account password.
         - `FM_HOST=`
             - The value should be the IP address or domain name of your FileMaker Server.
+        - `FM_PROTOCOL=`
+            - The protocol you want to communicate with. Either 'http' or 'https'.
+			- Defaults to 'http' if no environment value is provided.
+        - `FM_PORT=`
+            - The port to send the request over.
+			- Defaults to 80 if no environment value is provided.
+		- `FM_SSLVERIFYPEER=`
+			- Whether or not you want the SSL certificate for the target server verified.
+			- Defaults to true if no environment value is provided.
     - The `FM_` entries should look similar to this:
 
             FM_DATABASE=L5SimpleFMExample
             FM_USERNAME=web_user
             FM_PASSWORD=webdemo!
             FM_HOST=127.0.0.1
+			FM_PROTOCOL=https
+			FM_PORT=443
+			FM_SSLVERIFYPEER=true
 
 
 ## Important Notes
 
 ### When in *production*, **Never dump the L5SimpleFM object to the browser**!
-SimpleFM uses FileMaker Server's XML web publishing to access FileMaker. This means your database credentials are passes in the request. 
+SimpleFM uses FileMaker Server's XML web publishing to access FileMaker. This means your database credentials are passes in the request.
 
 You can see this if you die and var_dump the `L5SimpleFM->adapter->hostConnection` property.
 
@@ -165,7 +220,7 @@ NOTE: **If you're going to host this example file on a publicly accessible FileM
 
 L5SimpleFM can be used just as a basic data access tool by accessing the L5SimpleFM class or the FileMakerInterface directly, but it can also be used as a data model. Really, the difference between the two is very minor. The basic idea creating an instance of the L5SimpleFM class that is meant to only be used to access a specific entity (in FileMaker's case, this would likely be a single table via a layout).
 
-### Creating a L5SimpleFM model 
+### Creating a L5SimpleFM model
 
 A L5SimpleFM model should extend the `L5SimpleFM\FileMakerModels\BaseModel` class:
 
@@ -272,9 +327,9 @@ From here, you will have access to all of the methods outlined in [the `BaseMode
 
 ## executeCommand()
 
-For any of these commands to execute, you need to call or chain on the `executeCommand()` command. 
+For any of these commands to execute, you need to call or chain on the `executeCommand()` command.
 
-Any command chained before `executeCommand()` is just used to build up the request's form. This is what allows you to call the command methods separately or chained together. 
+Any command chained before `executeCommand()` is just used to build up the request's form. This is what allows you to call the command methods separately or chained together.
 
 The following is an example of an index method on a controller that breaks up the method calls to build up an object that allows paging through a record set and fires `executeCommand()` once it's set up:
 
@@ -357,7 +412,7 @@ We could perform a command like this:
 
 ## findByFields($fieldValues)
 
-L5SimpleFM accepts an associative array of `[field name => search value]`s for searching. 
+L5SimpleFM accepts an associative array of `[field name => search value]`s for searching.
 
 For instance, if we wanted to find all records in the `web_Users` layout from the company Skeleton Key who have a status of Active, we could use this chain of commands:
 
@@ -379,7 +434,7 @@ For instance, if we wanted to find all records in the `web_Users` layout from th
 
 FileMaker uses an internal record id for every record you create, regardless of if you add a serial number field to your tables. You can see this record id in FileMaker by going to the layout you want to search on, opening the Data Viewer, and entering the function `Get(RecordId)`.
 
-L5SimpleFM has a method specifically for searching by this record id. 
+L5SimpleFM has a method specifically for searching by this record id.
 
 Ex;ample. To find the record in the `web_Users` table with a recid of 3, we could use the following chain of commands:
 
@@ -394,7 +449,7 @@ Ex;ample. To find the record in the `web_Users` table with a recid of 3, we coul
 
 ## callScript($scriptName, $scriptParameters = null)
 
-A script can be set to fire after L5SimpleFM executes a different command. 
+A script can be set to fire after L5SimpleFM executes a different command.
 
 Here's the same log script fired after a findByRecId command:
 
@@ -520,7 +575,7 @@ While the total number of records found may be larger than 50, only 50 records w
 
 ## skip($count)
 
-Similar to the `max()` command, the `skip()` command can be added to commands that return a variable number of records to affect the records returned. Skip will determine what record to start with when returning a limited number of records. 
+Similar to the `max()` command, the `skip()` command can be added to commands that return a variable number of records to affect the records returned. Skip will determine what record to start with when returning a limited number of records.
 
     try {
         $searchFields = [
@@ -543,7 +598,7 @@ In this example, we're only returning up to 50 records and we'll start with the 
 
 ## sort($sortArray)
 
-L5SimpleFM accepts a multi-dimensional array of data to perform sorting. 
+L5SimpleFM accepts a multi-dimensional array of data to perform sorting.
 
 With sorting you **must** specify the:
 
@@ -584,7 +639,7 @@ Once you've built up your sort options array, you can pass them into the `sort()
 
 One of the shortcomings (in my opinion) of FileMaker's custom web publishing is that you cannot specify the fields returned from a request; you always get data from *every field on the layout* that you're requesting from. From a sql viewpoint, requests to FileMaker Server via custom web publishing are always `SELECT * FROM mylayout ...` and not `SELECT field1,field3,fieldN FROM mylayout ...`.
 
-Because of this I added the ability to reset the layout you're using at runtime. 
+Because of this I added the ability to reset the layout you're using at runtime.
 
     try {
         $searchFields = [
@@ -599,13 +654,13 @@ Because of this I added the ability to reset the layout you're using at runtime.
     }
     return compact('records');
 
-This means you can have more than one layout that represents an entity. 
+This means you can have more than one layout that represents an entity.
 
-An actual example of this is if your web app has a list that uses a handful of columns from your entity to let the user identify each record. Clicking on a row opens a new window that shows all of the fields for the entity. If you're only using one layout to represent the entity then you're always returning all of the fields for the entity when you generate the list view even though you don't need them. 
+An actual example of this is if your web app has a list that uses a handful of columns from your entity to let the user identify each record. Clicking on a row opens a new window that shows all of the fields for the entity. If you're only using one layout to represent the entity then you're always returning all of the fields for the entity when you generate the list view even though you don't need them.
 
 With the `resetLayout` command, you can define two layouts, a list layout with only the fields you need for the list and a details layout which has all of the fields you need for the details window. When you need to use the alternate layout (the one not defined as the `$layoutName` property in the model) you can use the `resetLayout` command to fire the request against the alternate layout.
 
-# Exceptions 
+# Exceptions
 
 All of the exceptions that L5SimpleFM throws come from the class `L5SimpleFMBase`. The exceptions can be caught by their individual names, e.g.:
 
@@ -632,7 +687,7 @@ For the `RecordsNotFoundException` and `GeneralException` classes, the result ob
        try {
             $searchFields = [
                 // there is no Error Company and the `RecordsNotFoundException` will be thrown
-                'company' => 'Error Company', 
+                'company' => 'Error Company',
                 'status' => 'Active',
             ];
 
@@ -641,8 +696,8 @@ For the `RecordsNotFoundException` and `GeneralException` classes, the result ob
         } catch (\Exception $e) {
             $message = $e->getMessage();
 
-            // You can use the `getCommandResult()` method to return 
-            // the entire SimpleFM result object. 
+            // You can use the `getCommandResult()` method to return
+            // the entire SimpleFM result object.
             $result = $e->getCommandResult();
             dd($result);
 
@@ -669,7 +724,7 @@ This also means you get access to the FmResultSet's other [result handling metho
        try {
             $searchFields = [
                 // there is no Error Company and the `RecordsNotFoundException` will be thrown
-                'company' => 'Error Company', 
+                'company' => 'Error Company',
                 'status' => 'Active',
             ];
 
@@ -691,7 +746,7 @@ This also means you get access to the FmResultSet's other [result handling metho
 
 ## LayoutNameIsMissingException
 
-This exception is thrown if you try to set a layout name without a value or with an empty string. 
+This exception is thrown if you try to set a layout name without a value or with an empty string.
 
 If you're creating FileMaker models with L5SimpleFM, you would see this error if you did not specify the `protected $layoutName;` property.
 
@@ -699,15 +754,15 @@ This exception does not contain a result object.
 
 ## NoResultReturnedException
 
-This exception is thrown if SimpleFM for some reason does not return a result object. 
+This exception is thrown if SimpleFM for some reason does not return a result object.
 
 This exception does not contain a result object.
 
 ## RecordsNotFoundException
 
-This exception is returned if your find query does not return a result. 
+This exception is returned if your find query does not return a result.
 
-I created a specific exception for this because it is an error that is thrown that you are likely to ignore. 
+I created a specific exception for this because it is an error that is thrown that you are likely to ignore.
 
 For example, if you're looking for an existing user record and creating a new record if an existing one isn't found, you could catch for the exception and flag to the rest of your app to create a new record:
 
@@ -717,7 +772,7 @@ For example, if you're looking for an existing user record and creating a new re
         $email = $request->get('email');
 
         $userRecord = $this->checkForExistingUserRecord($email);
-        
+
         if ($userRecord == false) {
             $record = $this->createNewUser($request->all());
         } else {
@@ -756,4 +811,4 @@ These would be any other FileMaker XML custom web publishing errors.
 
 The GeneralException **does** return a a command result.
 
-In fact, the only reason I defined a general exception instead of throwing a regular PHP Exception is so that the command result can be passed back. 
+In fact, the only reason I defined a general exception instead of throwing a regular PHP Exception is so that the command result can be passed back.
