@@ -167,12 +167,24 @@ For the purposes of this readme, I'll be using and referring to the [Demo file f
             - The value should be the website security account password.
         - `FM_HOST=`
             - The value should be the IP address or domain name of your FileMaker Server.
+        - `FM_PROTOCOL=`
+            - The protocol you want to communicate with. Either 'http' or 'https'.
+			- Defaults to 'http' if no environment value is provided.
+        - `FM_PORT=`
+            - The port to send the request over.
+			- Defaults to 80 if no environment value is provided.
+		- `FM_SSLVERIFYPEER=`
+			- Whether or not you want the SSL certificate for the target server verified.
+			- Defaults to true if no environment value is provided.
     - The `FM_` entries should look similar to this:
 
             FM_DATABASE=L5SimpleFMExample
             FM_USERNAME=web_user
             FM_PASSWORD=webdemo!
             FM_HOST=127.0.0.1
+			FM_PROTOCOL=https
+			FM_PORT=443
+			FM_SSLVERIFYPEER=true
 
 
 ## Important Notes
