@@ -35,8 +35,8 @@ class L5SimpleFMServiceProvider extends ServiceProvider
             $hostConnection = new HostConnection($host, $database, $username, $password, $protocol, $port, $sslVerifyPeer);
             $adapter = new Adapter($hostConnection);
             $adapter->setLoader(new Curl);
-            
-            return new L5SimpleFM();
+
+            return new L5SimpleFM($adapter);
         });
     }
 }
