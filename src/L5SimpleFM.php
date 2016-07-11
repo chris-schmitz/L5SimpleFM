@@ -141,7 +141,7 @@ class L5SimpleFM extends L5SimpleFMBase implements FileMakerInterface
         }
 
         // This is needed if we're only performing a script
-        if ($this->commandArray['-db'] == null) {
+        if (!array_key_exists('-db', $this->commandArray) || !isset($this->commandArray['-db'])) {
             $this->primeCommandArray();
         }
         $this->addToCommandArray([
